@@ -1,0 +1,20 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "pymvn"
+version = "1.0.0"
+dependencies = [
+    "requests",
+    "beautifulsoup4",
+    "xmltodict",
+    "singleton-decorator",
+]
+requires-python = ">=3.12"
+
+[tool.hatch.build]
+exclude = [
+    "/.*",
+    "/out",
+]
