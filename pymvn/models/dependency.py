@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from enum import StrEnum
+from enum import StrEnum, auto
 
 from pymvn.models.artifact_metadata import ArtifactMetadata
 
@@ -9,6 +9,11 @@ class DependencyScope(StrEnum):
     Test = 'test'
     Provided = 'provided'
     Runtime = 'runtime'
+    Unknown = auto()
+
+    @classmethod
+    def _missing_(cls, value):
+        return cls.Unknown
 
 
 @dataclass(frozen=True)

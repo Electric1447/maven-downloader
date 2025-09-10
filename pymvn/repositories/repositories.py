@@ -16,23 +16,26 @@ class Repositories(Repository):
         self.__repositories = [MavenCentral(parser), GoogleMaven(parser)]
 
     def list_artifact_files(self, artifact: ArtifactMetadata) -> dict[str, str]:
-        return self.__foreach_repository(lambda repo: repo.list_artifact_files(artifact))
+        return self.__foreach_repository(lambda repo: repo.list_artifact_files(artifact), artifact)
 
     def list_artifact_versions(self, group_id: str, artifact_id: str) -> tuple[str, str, list[str]]:
-        return self.__foreach_repository(lambda repo: repo.list_artifact_versions(group_id, artifact_id))
+        return self.__foreach_repository(
+            lambda repo: repo.list_artifact_versions(group_id, artifact_id),
+            (group_id, artifact_id),
+        )
 
     def get_artifact_pom(self, artifact: ArtifactMetadata) -> POM:
         print(f'get_artifact_pom: {artifact}')
-        return self.__foreach_repository(lambda repo: repo.get_artifact_pom(artifact))
+        return self.__foreach_repository(lambda repo: repo.get_artifact_pom(artifact), artifact)
 
-    def __foreach_repository(self, method: Callable[[Repository], Any]) -> Any:
+    def __foreach_repository(self, method: Callable[[Repository], Any], artifact: Any) -> Any:
         for repository in self.__repositories:
             try:
                 return method(repository)
             except requests.HTTPError:
                 continue
 
-        raise ArtifactNotFound('Artifact was not found in any of the repositories')
+        raise ArtifactNotFound(f'Artifact {artifact} was not found in any of the repositories')
 
     def __get_latest_version(self, group_id, artifact_id) -> str:
         return self.list_artifact_versions(group_id, artifact_id)[0]
