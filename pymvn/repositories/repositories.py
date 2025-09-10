@@ -1,7 +1,6 @@
 from typing import Any, Callable
 
 import requests
-from singleton_decorator import singleton
 
 from pymvn.models import ArtifactMetadata, POM
 from pymvn.repositories.exceptions import ArtifactNotFound
@@ -11,7 +10,6 @@ from pymvn.repositories.repository import Repository
 from pymvn.utils.parsing_utils import POMParser
 
 
-@singleton
 class Repositories(Repository):
     def __init__(self) -> None:
         parser = POMParser(self.__get_latest_version)
