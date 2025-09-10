@@ -1,3 +1,5 @@
+import os
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from typing import Collection
 
@@ -7,7 +9,7 @@ from pymvn.utils.download_utils import download_file
 
 
 class MavenDownloader:
-    def __init__(self, output_dir: Path, always_download = False) -> None:
+    def __init__(self, output_dir: Path, always_download: bool = False) -> None:
         self.__output_dir = output_dir
         self.__always_download = always_download
         self.__repositories = Repositories()
@@ -32,9 +34,13 @@ class MavenDownloader:
 
         return artifacts
 
-    def download_artifacts(self, artifacts: Collection[ArtifactMetadata]) -> None:
-        for artifact in artifacts:
-            self.download_artifact(artifact)
+    def download_artifacts(
+            self,
+            artifacts: Collection[ArtifactMetadata],
+            multithreading: bool = True,
+    ) -> None:
+        with ThreadPoolExecutor(max_workers=os.cpu_count() if multithreading else 1) as executor:
+            executor.map(self.download_artifact, artifacts)
 
     def download_artifact(self, artifact: ArtifactMetadata) -> None:
         print(f'Downloading: {artifact}')
