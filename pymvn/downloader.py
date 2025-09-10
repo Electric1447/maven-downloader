@@ -7,8 +7,9 @@ from pymvn.utils.download_utils import download_file
 
 
 class MavenDownloader:
-    def __init__(self, output_dir: Path) -> None:
+    def __init__(self, output_dir: Path, always_download = False) -> None:
         self.__output_dir = output_dir
+        self.__always_download = always_download
         self.__repositories = Repositories()
 
     def get_artifact_dependencies(self, artifact: ArtifactMetadata) -> set[ArtifactMetadata]:
@@ -39,6 +40,10 @@ class MavenDownloader:
         print(f'Downloading: {artifact}')
         files = self.__repositories.list_artifact_files(artifact)
         artifact_dir = self.__output_dir.joinpath(*artifact.to_parts())
+        if artifact_dir.exists() and not self.__always_download:
+            print(f'Skipping {artifact}')
+            return
+
         artifact_dir.mkdir(parents=True, exist_ok=True)
         for filename, url in files.items():
             download_file(url, artifact_dir / filename)
