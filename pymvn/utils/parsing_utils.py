@@ -59,6 +59,8 @@ class POMParser:
 
         dependencies = []
         for d in xml.iterchildren('dependencies', 'dependencyManagement'):
+            if d.tag == 'dependencyManagement':
+                d = d.find('dependencies')
             dependencies.extend(self.__parse_dependencies(
                 d.findall('dependency'),
                 version,
